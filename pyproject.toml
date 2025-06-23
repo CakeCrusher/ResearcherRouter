@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "researcher-router"
+version = "0.1.0"
+description = "Add your description here"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+python-dotenv = ">=1.1.0"
+qdrant-client = ">=1.14.2"
+discord-py = ">=2.3.2"
+sentence-transformers = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
