@@ -1,5 +1,10 @@
 import re
 from .addTag import add_log_tag
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from src.qdrant.qdrant import process_new_thread
+
 # If the channel updates its tag
 
 # Add channel to the database
@@ -27,13 +32,11 @@ async def addThread(bot, thread):
         attachments.extend(message.attachments) 
         urls.extend(re.findall(url_pattern, message.content))
 
-
     print(messages)
     print(thread_ID)
 
-    '''
-    Qdrant API here
-    '''
+    # Add to Qdrant collection
+    await process_new_thread(bot, thread, messages, urls, embeds, attachments)
 
     # Refer to API documentation to get Embed and Attachment information
     # Log if successful

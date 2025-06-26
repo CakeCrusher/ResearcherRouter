@@ -1,26 +1,95 @@
-# ResearchRouter: routing research questions to the right people
+# ResearcherRouter
 
-<p align="center">
-  <img src="https://sdmntprwestus2.oaiusercontent.com/files/00000000-4428-61f8-9eae-592cf6d09851/raw?se=2025-06-09T01%3A01%3A18Z&sp=r&sv=2024-08-04&sr=b&scid=48273da1-5a32-5405-a804-3982b0f26777&skoid=61180a4f-34a9-42b7-b76d-9ca47d89946d&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-08T23%3A13%3A38Z&ske=2025-06-09T23%3A13%3A38Z&sks=b&skv=2024-08-04&sig=bXBM1CNdFW5whYKq64wX6adaFnjJtcQyvYP6BN9fWeo%3D" alt="ResearchRouter Logo" width="400"/>
-</p>
+A Discord bot that helps researchers find people who discussed specific topics by automatically indexing research papers and discussions using Qdrant vector database.
 
+## 🏗️ Project Structure
 
-The community at SPS is generally composed of members actively engaged in several areas of research but knowing who is the right person to talk to for knowledge transfer is neither accurate nor efficient.
+```
+ResearcherRouter/
+├── main.py                 # Main entry point
+├── .env                    # Environment variables (create this)
+├── pyproject.toml          # Poetry dependencies
+├── poetry.lock            # Locked dependencies
+├── README.md              # This file
+├── .gitignore             # Git ignore rules
+├── scratch/               # Scratch files and experiments
+├── config/                # Configuration files
+│   ├── Dockerfile         # Docker configuration
+│   ├── docker-compose.yml # Qdrant service
+│   └── .dockerignore      # Docker ignore rules
+└── src/                   # Source code
+    ├── bot/               # Discord bot code
+    │   ├── main.py        # Bot entry point
+    │   ├── cogs/          # Bot commands and events
+    │   │   ├── Commands.py # Search commands
+    │   │   └── Events.py   # Event handlers
+    │   └── logic/         # Business logic
+    │       ├── addMember.py
+    │       ├── addTag.py
+    │       ├── addThread.py
+    │       ├── getThreadData.py
+    │       ├── initialize.py
+    │       └── updateThreadData.py
+    ├── qdrant/            # Qdrant database code
+    │   └── qdrant.py      # Qdrant operations
+    └── utils/             # Utility functions (future use)
+```
 
-## Solution
+## 🚀 Quick Start
 
-We will use the `cool-papers` channel as an index for our collective knowledge of research. We will use this collective knowledge and map the experts to the corresponding subjects such that whenever somebody has a question on a subject they can easily find a member that they can reach out to for answers.
+### 1. Set up environment
+```bash
+# Install dependencies
+poetry install
 
-## Technical Implementation
+# Create .env file with your Discord bot credentials
+cp .env.example .env
+# Edit .env with your actual values
+```
 
-- Vector store
-  - stores vectors of research material with relevant members in metadata
-  - search vector store against prompt to surface relevant research and consequently relevant members
-- Interface to Discord
-  - Forum migration on `cool-papers` channel for ingesting data, uses the discord `guild` as database through forum properties  
-  - @bot interface to ping (potentially) knowledgeable researchers to a query
-- Deploy discord bot (forum migration)
+### 2. Start Qdrant
+```bash
+# Using Docker Compose
+sudo docker-compose -f config/docker-compose.yml up -d
 
-## Resources
+# Or using Docker directly
+sudo docker run -p 6333:6333 -p 6334:6334 qdrant/qdrant
+```
 
-- [Figma](https://www.figma.com/board/ejeHzoSBKpxafkRqzt0rk8/ResearcherRouter?node-id=1-28&t=VVCTcXmk0rwvn9Zd-1)
+### 3. Run the bot
+```bash
+poetry run python main.py
+```
+
+## 🔧 Configuration
+
+Create a `.env` file with:
+```bash
+DISCORD_TOKEN=your_discord_bot_token_here
+PAPER_CHANNEL_ID=your_paper_channel_id_here
+SUMMARIZED_TAG=your_summarized_tag_id_here
+```
+
+## 🤖 Bot Commands
+
+- `@bot <topic>` - Search for people who discussed a topic
+- `!search <topic>` - Same as above
+- `!ping` - Test if bot is working
+
+## 📊 Features
+
+- **Automatic indexing** of Discord threads as research papers
+- **Semantic search** using sentence transformers
+- **Participant tracking** - finds all people who discussed topics
+- **Summary detection** - automatically identifies summarized papers
+- **Real-time updates** - indexes new messages and threads
+
+## 🐳 Docker Deployment
+
+```bash
+# Build image
+sudo docker build -f config/Dockerfile -t researcher-router .
+
+# Run with environment
+sudo docker run -d --name researcher-router-bot --env-file .env researcher-router
+```

@@ -3,7 +3,6 @@ from discord.ext import commands
 from logic.initialize import *
 from logic.updateThreadData import *
 from logic.getThreadData import *
-from logic.addMember import *
 from logic.addThread import *
 # Modify if needed
 

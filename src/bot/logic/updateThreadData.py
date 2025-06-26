@@ -1,6 +1,8 @@
 import re
-# Import neccessary qdrant_client packages
-
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from src.qdrant.qdrant import process_thread_update
 
 # Update the database in real time whenver a new thread is posted
 # Call when an on_thread_update event occurs
@@ -15,7 +17,7 @@ async def updateThreadData(message):
     urls = re.findall(url_pattern, content)
     embeds = message.embeds
     attachments = message.attachments
+    commenter_id = message.author.id  # Track who posted this message
 
-    '''
-    Qdrant API here
-    '''
+    # Update the paper in Qdrant collection
+    await process_thread_update(thread_id, content, urls, embeds, attachments, commenter_id)
