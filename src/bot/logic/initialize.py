@@ -1,7 +1,5 @@
 import os
-import re
-from .addThread import addThread
-# Import neccessary qdrant_client packages
+from .add_thread import *
 
 # Redirect storage from Forum to store information to the vector database
 # Logs all items in the forum at startup
@@ -18,5 +16,5 @@ async def initialize(bot):
         tags = [tag.id for tag in thread.applied_tags]
         if (sumID in tags) and (logID not in tags):
 
-            await addThread(bot, thread)
+            await add_thread(bot, thread)
         

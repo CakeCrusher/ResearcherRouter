@@ -1,6 +1,3 @@
-# NOTE : Might not need this file
-
-import discord
 from discord.ext import commands
 import sys
 import os
@@ -70,20 +67,8 @@ class Commands(commands.Cog):
             await ctx.send(response)
             
         except Exception as e:
-            await ctx.send(f"❌ Error searching: {str(e)}")
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        # Check if bot is mentioned
-        if self.bot.user.mentioned_in(message) and not message.author.bot:
-            # Extract the question (remove the @bot mention)
-            content = message.content.replace(f'<@{self.bot.user.id}>', '').strip()
-            
-            if content:
-                # Treat it as a search query
-                await self.search(message.channel, query=content)
-            else:
-                await message.channel.send("👋 Hi! I can help you find people who discussed specific topics. Try mentioning me with a question like: '@bot machine learning' or use `!search <topic>`")
+            await ctx.send(f"❌ Error searching: {str(e)}")      
+           
 
 async def setup(bot):
     await bot.add_cog(Commands(bot))
