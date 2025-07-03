@@ -68,6 +68,7 @@ Create a `.env` file with:
 DISCORD_TOKEN=your_discord_bot_token_here
 PAPER_CHANNEL_ID=your_paper_channel_id_here
 SUMMARIZED_TAG=your_summarized_tag_id_here
+LOGGED_TAG=your_logged_tag_id_here
 ```
 
 ## 🤖 Bot Commands
