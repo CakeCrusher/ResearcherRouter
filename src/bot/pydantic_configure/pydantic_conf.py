@@ -1,6 +1,11 @@
 from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
+'''
+Serialize Attachments, Messages, and Thread discord objects
+Removed Embedded objects and replaced with CommentSerialized.url
+The url can be extracted and used to gather needed information on the papers for comparison
+'''
 class AttachmentSerialized(BaseModel):
     filename: str
     attachment_id: int
