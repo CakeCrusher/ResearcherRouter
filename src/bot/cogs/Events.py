@@ -2,7 +2,6 @@ import os
 from discord.ext import commands
 from logic.initialize import *
 from logic.on_message_update import *
-from logic.getThreadData import *
 from logic.add_thread import *
 
 class Events(commands.Cog):
@@ -18,8 +17,7 @@ class Events(commands.Cog):
         print(f'Success! Logged in as {self.bot.user}')
         await initialize(self.bot) # load all Summarized threads
 
-    # getThreadData() when upon creation of a new thread
-    # Add the poster's ID, possible attachments or embeds, and messages
+    # add_thread() upon creation of a new thread
     @commands.Cog.listener()
     async def on_thread_create(self, thread):
         # Skip if not cool-papers
@@ -31,14 +29,10 @@ class Events(commands.Cog):
         if self.sumID not in tags:
             return
         
-        '''
-        NOTE: Use add_thread instead
-        '''
-        await get_thread_data(self.bot, thread)
+        await add_thread(self.bot, thread)
         return
     
-    # add_thread()
-    # Logs the channel if 'Sumbitted' tag is added after init thread creation
+    # add_thread() and logs the channel if 'Sumbitted' tag is added after init thread creation
     @commands.Cog.listener()
     async def on_thread_update(self, before, after):
 
