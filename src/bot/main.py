@@ -24,9 +24,13 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Load cogs (bot commands & events)
 async def load():
-    for filename in os.listdir('./src/bot/cogs'):
+    # Get the directory where this file is located
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    cogs_dir = os.path.join(current_dir, 'cogs')
+    
+    for filename in os.listdir(cogs_dir):
         if filename.endswith('.py'):
-            await bot.load_extension(f'cogs.{filename[:-3]}')
+            await bot.load_extension(f'bot.cogs.{filename[:-3]}')
 
 async def main():
     await load()

@@ -1,1 +1,1 @@
-from pydantic_configure.pydantic_conf import *
+from .pydantic_conf import *

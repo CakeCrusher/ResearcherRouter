@@ -188,7 +188,7 @@ async def process_new_thread(bot, thread, messages, urls, embeds, attachments):
     add_paper_to_collection(thread_data)
     
     # Log success (using your existing add_log_tag)
-    from logic.addTag import add_log_tag
+    from src.bot.logic.add_log_tag import add_log_tag
     await add_log_tag(bot, thread)
 
 async def process_thread_update(thread_id, new_message, urls, embeds, attachments, commenter_id=None):
