@@ -1,9 +1,8 @@
 import os
 from discord.ext import commands
 from bot.logic.initialize import *
-from bot.logic.updateThreadData import *
-from bot.logic.getThreadData import *
-from bot.logic.addThread import *
+from bot.logic.on_message_update import *
+from bot.logic.add_thread import *
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -31,7 +30,7 @@ class Events(commands.Cog):
         if self.sumID not in tags:
             return
         
-        await getThreadData(self.bot, thread)
+        await add_thread(self.bot, thread)
         return
 
     # addMember() on event trigger
@@ -61,7 +60,7 @@ class Events(commands.Cog):
         # If the forum is cool-papers
         if after.parent.id == self.forum_id:
             if (self.sumID not in before_tags) and (self.sumID in after_tags):
-                await addThread(self.bot, after)
+                await add_thread(self.bot, after)
         return
     
     # Listen for new messages in threads
@@ -79,7 +78,7 @@ class Events(commands.Cog):
         # If the message is sent in cool-papers forum threads
         if message.channel.parent_id == self.forum_id:
             # Add the information from the message to the thread's data
-            await updateThreadData(message)
+            await on_message_update(message)
             return
 
 async def setup(bot):

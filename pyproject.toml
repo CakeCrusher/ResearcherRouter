@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "researcher-router"
 version = "0.1.0"
-description = "Add your description here"
+description = "A Discord bot that helps researchers find people who discussed specific topics by automatically indexing research papers and discussions using Qdrant vector database."
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 

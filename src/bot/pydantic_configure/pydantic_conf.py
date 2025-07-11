@@ -1,5 +1,6 @@
 from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
+from datetime import datetime
 
 '''
 Serialize Attachments, Messages, and Thread discord objects
@@ -16,14 +17,17 @@ class AttachmentSerialized(BaseModel):
 class CommentSerialized(BaseModel):
     author_id: int      # tracks the author of the comment/message
     comment: str
-    url: List[HttpUrl]  # Comment can include multiple urls
-    attachments: List[AttachmentSerialized]
+    url: List[HttpUrl] = [] # Comment can include multiple urls
+    attachments: List[AttachmentSerialized] = []
+    created_at: datetime
 
 class ThreadSerialized(BaseModel):
-    thread_id: int
+    id: int
     owner_id: int       # tracks the author of the thread
     topic: str
+    tags: List[str]
     comments: List[CommentSerialized]
+    created_at: datetime
 
 
 
