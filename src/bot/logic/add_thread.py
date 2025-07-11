@@ -3,7 +3,7 @@ from .add_log_tag import add_log_tag
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from src.qdrant.qdrant import process_new_thread
+from src.qdrant.qdrant import process_new_thread, upload_success
 from bot.pydantic_configure import *
 
 # Add channel to the database
@@ -43,6 +43,7 @@ async def add_thread(bot, thread):
         comments = comment_obj,
         created_at = thread.created_at
     )
+
     '''
     get content in 
     python dict format: thread_obj.model_dump()
@@ -51,9 +52,8 @@ async def add_thread(bot, thread):
 
     # uncomment, but arguments should be changed    
     await process_new_thread(thread_obj)
+    success = await upload_success(thread)
 
-    '''
-    NOTE: need to verify whether the database insertion was successful,
-    then add_log_tag
-    '''
-    # await add_log_tag(bot, thread)
+    # need to verify whether the database insertion was successful, then add_log_tag
+    if success:
+        await add_log_tag(bot, thread)

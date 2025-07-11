@@ -246,6 +246,15 @@ async def process_thread_update(thread_id, message):
     except Exception as e:
         print(f"Error updating paper {thread_id}: {e}")
 
+async def upload_success(thread):
+    point_id = thread.id
+    points = client.retrieve(
+        collection_name='cool_papers', 
+        ids=[point_id]
+        )
+
+    return True if points else False
+   
 # Example usage functions
 
 def example_search():
