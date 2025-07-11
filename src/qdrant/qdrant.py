@@ -4,6 +4,7 @@ import asyncio
 from datetime import datetime
 
 # Initialize the encoder and client
+# TODO: Upload data to cloud instead of locally
 encoder = SentenceTransformer("all-MiniLM-L6-v2")
 client = QdrantClient("http://localhost:6333")  # Adjust URL as needed
 
@@ -47,10 +48,10 @@ def add_paper_to_collection(thread_data):
         text_for_embedding = thread_data['title']
     else:
         text_for_embedding = thread_data.get('content', '')
-    
+
     # Generate embedding
     embedding = encoder.encode(text_for_embedding)
-    
+
     # Prepare payload
     payload = {
         "thread_id": thread_data['thread_id'],
@@ -64,7 +65,6 @@ def add_paper_to_collection(thread_data):
         "timestamp": thread_data.get('timestamp', datetime.now().isoformat()),
         "embedding_text": text_for_embedding  # Store what was used for embedding
     }
-    
     # Upload to Qdrant
     client.upload_points(
         collection_name=collection_name,
@@ -154,44 +154,45 @@ def update_paper_in_collection(thread_id, new_data):
 
 # Integration functions for your existing Discord parsing logic
 
-async def process_new_thread(bot, thread, messages, urls, embeds, attachments):
+async def process_new_thread(thread):
     """
     Process a new Discord thread and add it to Qdrant
-    This integrates with your existing getThreadData logic
+    This integrates with existing add_thread logic
     """
-    # Check if thread has "Summarized" tag
-    has_summary = False
-    summary = ""
-    tags = [tag.name for tag in thread.applied_tags]
+    # New threads are already confirmed to have Summarized tag
     
-    if "Summarized" in tags:
-        has_summary = True
-        if messages:
-            summary = messages[0]  # First message is the summary
-    
+    '''
+    summary = first comment in the thread
+    NOTE: The thread will ALWAYS contain at least a starting message - checks are redundant
+    - The summary will need to be changed to properly log the summary since it isn't guaranteed to be the first message, 
+      I will figure out how to scrape from discord and include it as an attribute in the pydantic model
+    '''
+    summary = thread.comments[0].comment
+
     # Prepare thread data
+    # NOTE: removed embeds, redundant. Use Urls instead.
     thread_data = {
         'thread_id': thread.id,
-        'title': thread.name,
-        'content': messages[0] if messages else '',
-        'urls': urls,
+        'title': thread.topic,
+        'content': thread.comments[0], # removed checks: the thread cannot be posted without a message
+        'urls': [comment.url for comment in thread.comments],
         'poster_id': thread.owner_id,
-        'messages': messages,
-        'summary': summary if has_summary else '',
-        'tags': tags,
+        'messages': [comment for comment in thread.comments if comment.url], # CommentSerialized objs
+        'summary': summary,
+        'tags': thread.tags,
         'timestamp': thread.created_at.isoformat(),
-        'embeds': [embed.to_dict() for embed in embeds],
-        'attachments': [att.url for att in attachments]
+        'attachments': [comment.attachments for comment in thread.comments]
     }
-    
     # Add to Qdrant
     add_paper_to_collection(thread_data)
-    
-    # Log success (using your existing add_log_tag)
-    from src.bot.logic.add_log_tag import add_log_tag
-    await add_log_tag(bot, thread)
 
-async def process_thread_update(thread_id, new_message, urls, embeds, attachments, commenter_id=None):
+    ''' 
+    NOTE: removed add_log_tag in method:
+    It is already being checked within the bot logic
+    '''
+
+
+async def process_thread_update(thread_id, message):
     """
     Process a thread update and update the paper in Qdrant
     This integrates with your existing updateThreadData logic
@@ -209,17 +210,17 @@ async def process_thread_update(thread_id, new_message, urls, embeds, attachment
         existing_data = existing[0].payload
         
         # Update with new information
+        # NOTE: removed embed parameter
         updated_data = existing_data.copy()
-        updated_data['messages'].append(new_message)
-        updated_data['urls'].extend(urls)
-        updated_data['embeds'].extend([embed.to_dict() for embed in embeds])
-        updated_data['attachments'].extend([att.url for att in attachments])
+        updated_data['messages'].append(message.comment)
+        updated_data['urls'].extend(message.url)
+        updated_data['attachments'].extend(message.attachments)
         
         # Track all participants
         if 'participants' not in updated_data:
             updated_data['participants'] = []
-        if commenter_id and commenter_id not in updated_data['participants']:
-            updated_data['participants'].append(commenter_id)
+        if message.author_id and message.author_id not in updated_data['participants']:
+            updated_data['participants'].append(message.author_id)
         
         # Re-generate embedding if needed (e.g., if summary was updated)
         if updated_data.get('summary'):
