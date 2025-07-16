@@ -9,30 +9,33 @@ ResearcherRouter/
 ├── main.py                 # Main entry point
 ├── .env                    # Environment variables (create this)
 ├── pyproject.toml          # Poetry dependencies
-├── poetry.lock            # Locked dependencies
-├── README.md              # This file
-├── .gitignore             # Git ignore rules
-├── scratch/               # Scratch files and experiments
-├── config/                # Configuration files
-│   ├── Dockerfile         # Docker configuration
-│   ├── docker-compose.yml # Qdrant service
-│   └── .dockerignore      # Docker ignore rules
-└── src/                   # Source code
-    ├── bot/               # Discord bot code
-    │   ├── main.py        # Bot entry point
-    │   ├── cogs/          # Bot commands and events
-    │   │   ├── Commands.py # Search commands
-    │   │   └── Events.py   # Event handlers
-    │   └── logic/         # Business logic
-    │       ├── addMember.py
-    │       ├── addTag.py
-    │       ├── addThread.py
-    │       ├── getThreadData.py
-    │       ├── initialize.py
-    │       └── updateThreadData.py
-    ├── qdrant/            # Qdrant database code
-    │   └── qdrant.py      # Qdrant operations
-    └── utils/             # Utility functions (future use)
+├── poetry.lock             # Locked dependencies
+├── README.md               # This file
+├── .gitignore              # Git ignore rules
+├── scratch/                # Scratch files and experiments
+├── config/                 # Configuration files
+│   ├── Dockerfile          # Docker configuration
+│   ├── docker-compose.yml  # Qdrant service
+│   └── .dockerignore       # Docker ignore rules
+└── src/                    # Source code
+    ├── bot/                # Discord bot code
+    │   ├── main.py         # Bot entry point
+    │   ├── cogs/           # Bot commands and events
+    │   │   ├── Commands.py  # Search commands
+    │   │   └── Events.py    # Event handlers
+    │   ├── logic/          # Business logic
+    │   │   ├── __init__.py
+    │   │   ├── add_log_tag.py       # Add tags to logs
+    │   │   ├── add_thread.py        # Add thread info to Qdrant
+    │   │   ├── initialize.py        # Initialize bot/session state
+    │   │   └── on_message_update.py # Handle message edits/updates
+    │   └── pydantic_configure/      # Pydantic settings and models
+    │       ├── __init__.py
+    │       └── pydantic_conf.py     # Pydantic BaseSettings & config loading
+    ├── qdrant/             # Qdrant database code
+    │   └── qdrant.py       # Qdrant operations
+    └── utils/              # Utility functions (future use)
+
 ```
 
 ## 🚀 Quick Start
