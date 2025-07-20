@@ -2,12 +2,14 @@ from qdrant_client import models, QdrantClient
 from sentence_transformers import SentenceTransformer
 import asyncio
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+
 
 # Initialize the encoder and client
-# TODO: Upload data to cloud instead of locally
 encoder = SentenceTransformer("all-MiniLM-L6-v2")
-client = QdrantClient("http://localhost:6333")  # Adjust URL as needed
-
+load_dotenv()
+client = QdrantClient(url=os.environ['QDRANT_URL'], api_key=os.environ['QDRANT_API_KEY'])  # Adjust URL and API KEY as needed
 collection_name = "cool_papers"
 
 def create_collection():
