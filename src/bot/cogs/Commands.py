@@ -47,7 +47,7 @@ class Commands(commands.Cog):
             
             # Get paper info for context
             paper_info = []
-            for result in results[:3]:  # Show first 3 papers
+            for result in results[:5]:  # Show first 5 papers
                 payload = result.payload
                 title = payload.get('title', 'No title')
                 summary = payload.get('summary', '')
@@ -61,7 +61,7 @@ class Commands(commands.Cog):
             for username in sorted(usernames):
                 response += f"👤 {username}\n"
             
-            response += f"\n**Found {len(results)} related discussions:**\n"
+            response += f"\n**Found {5 if len(results) > 5 else len(results)} related discussions:**\n"
             for info in paper_info:
                 response += f"{info}\n"
             
