@@ -49,11 +49,12 @@ async def add_thread(bot, thread):
     python dict format: thread_obj.model_dump()
     json format: thread_obj.model_dump_json(indent=2)
     '''
-
-    # uncomment, but arguments should be changed    
+    print(thread_obj.model_dump_json(indent=2))
+  
     await process_new_thread(thread_obj)
     success = await upload_success(thread)
 
     # need to verify whether the database insertion was successful, then add_log_tag
-    if success:
-        await add_log_tag(bot, thread)
+    ''' Remove comment when testing is complete '''
+    # if success:
+    #     await add_log_tag(bot, thread)

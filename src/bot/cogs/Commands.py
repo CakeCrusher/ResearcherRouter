@@ -9,6 +9,10 @@ class Commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def cog_check(self, ctx):
+        allowed_channel=int(os.getenv('ALLOWED_CHANNELS'))
+        return ctx.channel.id == allowed_channel
+    
     @commands.command()
     async def ping(self, ctx):
         await ctx.send("pong!")

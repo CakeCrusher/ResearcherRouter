@@ -80,6 +80,12 @@ class Events(commands.Cog):
             # Add the information from the message to the thread's data
             await on_message_update(message)
             return
+    
+    # @commands.Cog.listener()
+    # async def on_command_error(self, ctx, error):
+    #     '''Listens to command errors and responds'''
+    #     if isinstance(error, commands.CheckFailure):
+    #         await ctx.send("Commands not active in this channel.")
 
 async def setup(bot):
     await bot.add_cog(Events(bot))
