@@ -19,13 +19,17 @@ class CommentSerialized(BaseModel):
     comment: str
     url: List[HttpUrl] = [] # Comment can include multiple urls
     attachments: List[AttachmentSerialized] = []
+    reactions: List[str] = []
     created_at: datetime
 
 class ThreadSerialized(BaseModel):
     id: int
     owner_id: int       # tracks the author of the thread
+    participants: List[int]
     topic: str
     tags: List[str]
+    urls: List[HttpUrl] = []
+    summary: Optional[str] = None
     comments: List[CommentSerialized]
     created_at: datetime
 

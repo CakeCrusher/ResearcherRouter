@@ -4,6 +4,8 @@ import asyncio
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+import traceback
+import json
 
 
 # Initialize the encoder and client
@@ -49,7 +51,7 @@ def add_paper_to_collection(thread_data):
     elif thread_data.get('title'):
         text_for_embedding = thread_data['title']
     else:
-        text_for_embedding = thread_data.get('content', '')
+        text_for_embedding = thread_data.get('starter_msg', '')
 
     # Generate embedding
     embedding = encoder.encode(text_for_embedding)
@@ -58,11 +60,12 @@ def add_paper_to_collection(thread_data):
     payload = {
         "thread_id": thread_data['thread_id'],
         "title": thread_data.get('title', ''),
-        "content": thread_data.get('content', ''),
+        "starter_msg": thread_data.get('starter_msg', ''),
         "urls": thread_data.get('urls', []),
         "poster_id": thread_data['poster_id'],
-        "messages": thread_data.get('messages', []),
+        'participants': thread_data['participants'],
         "summary": thread_data.get('summary', ''),
+        "messages": thread_data.get('messages', []),
         "tags": thread_data.get('tags', []),
         "timestamp": thread_data.get('timestamp', datetime.now().isoformat()),
         "embedding_text": text_for_embedding  # Store what was used for embedding
@@ -139,7 +142,7 @@ def update_paper_in_collection(thread_id, new_data):
     """
     # Check if paper exists
     try:
-        existing = client.retrieve_points(
+        existing = client.retrieve(
             collection_name=collection_name,
             ids=[thread_id]
         )
@@ -169,21 +172,21 @@ async def process_new_thread(thread):
     - The summary will need to be changed to properly log the summary since it isn't guaranteed to be the first message, 
       I will figure out how to scrape from discord and include it as an attribute in the pydantic model
     '''
-    summary = thread.comments[0].comment
+    summary = thread.summary
 
     # Prepare thread data
     # NOTE: removed embeds, redundant. Use Urls instead.
     thread_data = {
         'thread_id': thread.id,
         'title': thread.topic,
-        'content': thread.comments[0], # removed checks: the thread cannot be posted without a message
-        'urls': [comment.url for comment in thread.comments],
+        'starter_msg': thread.comments[0], # removed checks: the thread cannot be posted without a message
+        'urls': thread.urls,
         'poster_id': thread.owner_id,
-        'messages': [comment for comment in thread.comments if comment.url], # CommentSerialized objs
+        'participants': thread.participants,
         'summary': summary,
+        'messages': thread.comments, # CommentSerialized objs
         'tags': thread.tags,
         'timestamp': thread.created_at.isoformat(),
-        'attachments': [comment.attachments for comment in thread.comments]
     }
     # Add to Qdrant
     add_paper_to_collection(thread_data)
@@ -201,7 +204,7 @@ async def process_thread_update(thread_id, message):
     """
     # Retrieve existing paper data
     try:
-        existing = client.retrieve_points(
+        existing = client.retrieve(
             collection_name=collection_name,
             ids=[thread_id]
         )
@@ -210,13 +213,12 @@ async def process_thread_update(thread_id, message):
             return
         
         existing_data = existing[0].payload
-        
         # Update with new information
         # NOTE: removed embed parameter
         updated_data = existing_data.copy()
-        updated_data['messages'].append(message.comment)
+        print(json.dumps(updated_data, indent=2))
+        updated_data['messages'].append(message)
         updated_data['urls'].extend(message.url)
-        updated_data['attachments'].extend(message.attachments)
         
         # Track all participants
         if 'participants' not in updated_data:
@@ -233,7 +235,7 @@ async def process_thread_update(thread_id, message):
         embedding = encoder.encode(text_for_embedding)
         
         # Update in Qdrant
-        client.upsert_points(
+        client.upsert(
             collection_name=collection_name,
             points=[
                 models.PointStruct(
@@ -244,17 +246,16 @@ async def process_thread_update(thread_id, message):
             ]
         )
         print(f"Updated paper {thread_id} in collection")
-        
-    except Exception as e:
-        print(f"Error updating paper {thread_id}: {e}")
 
-async def upload_success(thread):
+    except Exception as e:
+        print(f"Error updating paper {thread_id}: {e.__class__.__name__}: {e}")
+        traceback.print_exc()
+async def thread_exists(thread):
     point_id = thread.id
     points = client.retrieve(
         collection_name='cool_papers', 
         ids=[point_id]
         )
-
     return True if points else False
    
 # Example usage functions
