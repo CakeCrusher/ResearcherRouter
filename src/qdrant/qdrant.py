@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import traceback
 import json
 
-
+"""TODO: CREATE NEW COLLECTION 'IEEE SPS' """
 # Initialize the encoder and client
 encoder = SentenceTransformer("all-MiniLM-L6-v2")
 load_dotenv()
@@ -36,11 +36,13 @@ def add_paper_to_collection(thread_data):
         thread_data: Dictionary containing paper information
             - thread_id: Discord thread ID
             - title: Paper title
+            - starter_msg: The first message in the post
             - content: Paper content/description
             - urls: List of URLs (paper links)
             - poster_id: Discord user ID who posted
+            - participants: List of users participating in discussion
             - messages: List of all messages in thread
-            - summary: Summary if available (first message if tagged as summarized)
+            - summary: Summary if available
             - tags: List of tags
             - timestamp: When thread was created
     """
@@ -103,6 +105,8 @@ def search_papers(query, limit=5):
         query_vector=query_embedding.tolist(),
         limit=limit
     )
+
+    results = [item for item in results if item.score > 1/2]
     
     return results
 
@@ -164,16 +168,9 @@ async def process_new_thread(thread):
     Process a new Discord thread and add it to Qdrant
     This integrates with existing add_thread logic
     """
-    # New threads are already confirmed to have Summarized tag
-    
-    '''
-    summary = first comment in the thread
-    NOTE: The thread will ALWAYS contain at least a starting message - checks are redundant
-    '''
     summary = thread.summary
 
     # Prepare thread data
-    # NOTE: removed embeds, redundant. Use Urls instead.
     thread_data = {
         'thread_id': thread.id,
         'title': thread.topic,
@@ -188,11 +185,6 @@ async def process_new_thread(thread):
     }
     # Add to Qdrant
     add_paper_to_collection(thread_data)
-
-    ''' 
-    NOTE: removed add_log_tag in method:
-    It is already being checked within the bot logic
-    '''
 
 
 async def process_thread_update(thread_id, message, summary=None):

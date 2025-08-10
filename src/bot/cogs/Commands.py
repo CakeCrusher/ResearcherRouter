@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import sys
 import os
+import traceback
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from src.qdrant.qdrant import search_papers, get_participants_from_results
 
@@ -42,45 +43,64 @@ class Commands(commands.Cog):
             results = search_papers(query, limit=5)
             
             if not results:
-                await ctx.send(f"❌ No discussions found about '{query}'. Try a different search term!")
+                await ctx.send(f"No discussions found about '{query}'. Try a different search term!")
                 return
             
             # Get all participants from the search results
             participant_ids = get_participants_from_results(results)
             
             # Get usernames from Discord
-            usernames = []
-            for user_id in participant_ids:
-                try:
-                    user = await self.bot.fetch_user(user_id)
-                    usernames.append(user.display_name)
-                except:
-                    usernames.append(f"User_{user_id}")
+            user_ids = [id for id in participant_ids]
             
             # Get paper info for context
             paper_info = []
             for result in results[:5]:  # Show first 5 papers
                 payload = result.payload
-                title = payload.get('title', 'No title')
                 summary = payload.get('summary', '')
-                paper_info.append(f"📄 **{title}**")
+                thread = await self.bot.fetch_channel(result.id)
+                '''Link to thread channel format: https://discord.com/channels/<guild_id>/<thread_id>'''
+                link = f"https://discord.com/channels/{thread.parent.guild.id}/{thread.id}"
+                description = ""
+            
                 if summary:
-                    paper_info.append(f"\t-Summary: {summary[:100]}...")
+                    if len(summary) > 200:
+                        description = f"{summary[:200]}..."
+                    else:
+                        description = f"{summary}"
+
+                embed = discord.Embed(
+                    title=f'{link}',
+                    description=description,
+                    color=discord.Colour.from_rgb(255,255,255)
+                )
+
+                paper_info.append(embed)
             
             # Create response
             response = f"🔍 **Search results for '{query}':**\n\n"
             response += "**People who discussed this topic:**\n"
-            for username in sorted(usernames):
-                response += f"👤 {username}\n"
+            for id in user_ids:
+                user = await self.bot.fetch_user(id)
+                if user:
+                    response += f"<@{id}>\n"
+                else:
+                    response += "User with ID {id} not found or deleted"
             
             response += f"\n**Found {5 if len(results) > 5 else len(results)} related discussions:**\n"
-            for info in paper_info:
-                response += f"{info}\n"
             
-            await ctx.send(response)
+            await ctx.reply(
+                response,
+                embeds=paper_info,
+                allowed_mentions=discord.AllowedMentions(
+                    users=False,
+                    replied_user=True
+                )
+            )
             
         except Exception as e:
-            await ctx.send(f"❌ Error searching: {str(e)}")
+            await ctx.reply(f"❌ Error searching: {str(e)}")
+            print(f"Error searching: {str(e)}: {e.__class__.__name__}: {e}")
+            traceback.print_exc()
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -95,7 +115,7 @@ class Commands(commands.Cog):
             
             if content:
                 # Treat it as a search query
-                await self.search(message.channel, query=content)
+                await self.search(message, query=content)
             else:
                 await message.channel.send(f"👋 Hi! I can help you find people who discussed specific topics. Try mentioning me with a question like: '{self.bot.user.mention} machine learning' or use `!search <topic>`")
 
