@@ -76,6 +76,10 @@ class Commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        # Test mode: validate channel
+        channel = self.bot.get_channel(int(os.getenv('ALLOWED_CHANNELS')))
+        if not message.channel == channel:
+            return
         # Check if bot is mentioned
         if self.bot.user.mentioned_in(message) and not message.author.bot:
             # Extract the question (remove the @bot mention)
@@ -85,7 +89,9 @@ class Commands(commands.Cog):
                 # Treat it as a search query
                 await self.search(message.channel, query=content)
             else:
-                await message.channel.send("👋 Hi! I can help you find people who discussed specific topics. Try mentioning me with a question like: '@bot machine learning' or use `!search <topic>`")
+                await message.channel.send('''👋 Hi! I can help you find people who discussed specific topics. 
+                                        Try mentioning me with a question like:
+                                        '@bot machine learning' or use `!search <topic>`''')
 
     @commands.command()
     async def listtags(self, ctx):

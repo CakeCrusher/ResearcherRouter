@@ -169,8 +169,6 @@ async def process_new_thread(thread):
     '''
     summary = first comment in the thread
     NOTE: The thread will ALWAYS contain at least a starting message - checks are redundant
-    - The summary will need to be changed to properly log the summary since it isn't guaranteed to be the first message, 
-      I will figure out how to scrape from discord and include it as an attribute in the pydantic model
     '''
     summary = thread.summary
 
@@ -197,7 +195,7 @@ async def process_new_thread(thread):
     '''
 
 
-async def process_thread_update(thread_id, message):
+async def process_thread_update(thread_id, message, summary=None):
     """
     Process a thread update and update the paper in Qdrant
     This integrates with your existing updateThreadData logic
@@ -214,11 +212,10 @@ async def process_thread_update(thread_id, message):
         
         existing_data = existing[0].payload
         # Update with new information
-        # NOTE: removed embed parameter
         updated_data = existing_data.copy()
-        print(json.dumps(updated_data, indent=2))
         updated_data['messages'].append(message)
         updated_data['urls'].extend(message.url)
+        updated_data['summary'] = summary if summary else existing_data['summary']
         
         # Track all participants
         if 'participants' not in updated_data:
@@ -227,11 +224,7 @@ async def process_thread_update(thread_id, message):
             updated_data['participants'].append(message.author_id)
         
         # Re-generate embedding if needed (e.g., if summary was updated)
-        if updated_data.get('summary'):
-            text_for_embedding = updated_data['summary']
-        else:
-            text_for_embedding = updated_data.get('title', '')
-        
+        text_for_embedding = updated_data['summary'] if updated_data['summary'] else updated_data['title']
         embedding = encoder.encode(text_for_embedding)
         
         # Update in Qdrant
@@ -250,10 +243,11 @@ async def process_thread_update(thread_id, message):
     except Exception as e:
         print(f"Error updating paper {thread_id}: {e.__class__.__name__}: {e}")
         traceback.print_exc()
+
 async def thread_exists(thread):
     point_id = thread.id
     points = client.retrieve(
-        collection_name='cool_papers', 
+        collection_name=collection_name, 
         ids=[point_id]
         )
     return True if points else False
