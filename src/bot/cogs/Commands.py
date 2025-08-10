@@ -15,13 +15,21 @@ class Commands(commands.Cog):
     
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send("pong!")
+        '''Shows Latency'''
+        await ctx.send(f"Pong! {self.bot.latency*1000:.2f}ms")
     
     @commands.command()
     async def check_perms(self, ctx):
+        '''Checks the bot's permission value for the current channel. (Admin only)'''
+        if not ctx.author.guild_permissions.administrator:
+            return
         perms = ctx.channel.permissions_for(ctx.guild.get_member(self.bot.user.id))
         await ctx.send(f"My permissions here:\n{perms}")
 
+    @commands.command()
+    async def instructions(self, ctx):
+        await ctx.send(f"Try mentioning me with a question like: '{self.bot.user.mention} machine learning' or use `!search <topic>`")
+        
     @commands.command()
     async def search(self, ctx, *, query):
         """
@@ -57,7 +65,7 @@ class Commands(commands.Cog):
                 summary = payload.get('summary', '')
                 paper_info.append(f"📄 **{title}**")
                 if summary:
-                    paper_info.append(f"   Summary: {summary[:100]}...")
+                    paper_info.append(f"\t-Summary: {summary[:100]}...")
             
             # Create response
             response = f"🔍 **Search results for '{query}':**\n\n"
@@ -89,9 +97,7 @@ class Commands(commands.Cog):
                 # Treat it as a search query
                 await self.search(message.channel, query=content)
             else:
-                await message.channel.send('''👋 Hi! I can help you find people who discussed specific topics. 
-                                        Try mentioning me with a question like:
-                                        '@bot machine learning' or use `!search <topic>`''')
+                await message.channel.send(f"👋 Hi! I can help you find people who discussed specific topics. Try mentioning me with a question like: '{self.bot.user.mention} machine learning' or use `!search <topic>`")
 
     @commands.command()
     async def listtags(self, ctx):
