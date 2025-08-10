@@ -7,34 +7,36 @@ A Discord bot that helps researchers find people who discussed specific topics b
 ```
 ResearcherRouter/
 ├── main.py                 # Main entry point
+├── test_paper.py           # Test script for paper-related features
 ├── .env                    # Environment variables (create this)
 ├── pyproject.toml          # Poetry dependencies
 ├── poetry.lock             # Locked dependencies
 ├── README.md               # This file
 ├── .gitignore              # Git ignore rules
-├── scratch/                # Scratch files and experiments
 ├── config/                 # Configuration files
 │   ├── Dockerfile          # Docker configuration
 │   ├── docker-compose.yml  # Qdrant service
-│   └── .dockerignore       # Docker ignore rules
+│   ├── .dockerignore       # Docker ignore rules
+│   └── qdrant_storage/     # Qdrant local data storage
+├── icon/                   # Bot icons, branding assets
 └── src/                    # Source code
     ├── bot/                # Discord bot code
     │   ├── main.py         # Bot entry point
     │   ├── cogs/           # Bot commands and events
-    │   │   ├── Commands.py  # Search commands
-    │   │   └── Events.py    # Event handlers
+    │   │   ├── Commands.py     # Search commands
+    │   │   └── Events.py       # Event handlers
     │   ├── logic/          # Business logic
     │   │   ├── __init__.py
     │   │   ├── add_log_tag.py       # Add tags to logs
     │   │   ├── add_thread.py        # Add thread info to Qdrant
     │   │   ├── initialize.py        # Initialize bot/session state
-    │   │   └── on_message_update.py # Handle message edits/updates
+    │   │   ├── on_message_update.py # Handle message edits/updates
+    │   │   └── thread_summary.py    # Handle thread summary logic
     │   └── pydantic_configure/      # Pydantic settings and models
     │       ├── __init__.py
     │       └── pydantic_conf.py     # Pydantic BaseSettings & config loading
     ├── qdrant/             # Qdrant database code
     │   └── qdrant.py       # Qdrant operations
-    └── utils/              # Utility functions (future use)
 
 ```
 
