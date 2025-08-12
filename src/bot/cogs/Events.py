@@ -4,6 +4,30 @@ from bot.logic.initialize import *
 from bot.logic.on_message_update import *
 from bot.logic.add_thread import *
 from bot.logic.thread_summary import *
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from src.qdrant.qdrant import delete_thread
+
+'''Updates thread when message events are triggered'''
+async def update_message_data(bot, message):
+        sum_id = int(os.getenv('SUMMARIZED_TAG'))
+    # If message author is bot
+        if message.author == bot.user:
+            return
+        # Only process messages in forum threads
+        if not hasattr(message.channel, 'parent_id'):
+            return
+        tags = [tag.id for tag in message.channel.applied_tags]
+        # Starter message: skip
+        if message == message.channel.starter_message:
+            return
+        # Not Summarized channel: skip
+        if sum_id not in tags:
+            return
+        
+        # Add the information from the message to the thread's data
+        await on_message_update(message)
+        return
+
 
 class Events(commands.Cog):
     def __init__(self, bot):
@@ -31,6 +55,19 @@ class Events(commands.Cog):
         
         await add_thread(self.bot, thread)
         return
+    
+    @commands.Cog.listener()
+    async def on_thread_delete(self, thread):
+
+        if not thread.parent_id == self.forum_id:
+            return
+        
+        tags = [tag.id for tag in thread.applied_tags]
+        if self.sum_id not in tags:
+            return
+        
+        await delete_thread(thread)
+        return
 
     # Logs the channel if 'Sumbitted' tag is added after init thread creation
     @commands.Cog.listener()
@@ -44,27 +81,19 @@ class Events(commands.Cog):
         return
     
     # Listen for new messages in threads
-    # Updates thread when new messages are detected
+    
     @commands.Cog.listener()
     async def on_message(self, message):
-        # If message author is bot
-        if message.author == self.bot.user:
-            return
-        # Only process messages in forum threads
-        if not hasattr(message.channel, 'parent_id'):
-            return
-        tags = [tag.id for tag in message.channel.applied_tags]
-        # Starter message: skip
-        if message == message.channel.starter_message:
-            return
-        # Not Summarized channel: skip
-        if self.sum_id not in tags:
-            return
-        
+        await update_message_data(self.bot, message)
 
-        # Add the information from the message to the thread's data
-        await on_message_update(message)
-        return
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        await update_message_data(self.bot, message)
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
+        await update_message_data(self.bot, after)    
+        
         
     # Update metadata: add reactions to messages
     @commands.Cog.listener()

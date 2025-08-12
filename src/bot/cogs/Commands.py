@@ -4,7 +4,7 @@ import sys
 import os
 import traceback
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from src.qdrant.qdrant import search_papers, get_participants_from_results
+from src.qdrant.qdrant import search_papers, get_participants_from_results, delete_thread
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -57,9 +57,15 @@ class Commands(commands.Cog):
             for result in results[:5]:  # Show first 5 papers
                 payload = result.payload
                 summary = payload.get('summary', '')
-                thread = await self.bot.fetch_channel(result.id)
-                '''Link to thread channel format: https://discord.com/channels/<guild_id>/<thread_id>'''
-                link = f"https://discord.com/channels/{thread.parent.guild.id}/{thread.id}"
+                try:
+                    thread = await self.bot.fetch_channel(result.id)
+                    '''Link to thread channel format: https://discord.com/channels/<guild_id>/<thread_id>'''
+                    link = f"https://discord.com/channels/{thread.parent.guild.id}/{thread.id}"
+                except Exception as e:
+                    await delete_thread(result)
+                    link = "Invalid or deleted thread"
+                
+      
                 description = ""
             
                 if summary:
@@ -80,14 +86,17 @@ class Commands(commands.Cog):
             response = f"🔍 **Search results for '{query}':**\n\n"
             response += "**People who discussed this topic:**\n"
             for id in user_ids:
-                user = await self.bot.fetch_user(id)
-                if user:
+                try:
+                    user = await self.bot.fetch_user(id)
                     response += f"<@{id}>\n"
-                else:
+                except Exception as e:
+                    print(f"Error searching: {str(e)}: {e.__class__.__name__}: {e}")
+                    traceback.print_exc()
                     response += "User with ID {id} not found or deleted"
             
             response += f"\n**Found {5 if len(results) > 5 else len(results)} related discussions:**\n"
             
+            ''' NOTE: users=True once testing is finished '''
             await ctx.reply(
                 response,
                 embeds=paper_info,

@@ -106,7 +106,7 @@ def search_papers(query, limit=5):
         limit=limit
     )
 
-    results = [item for item in results if item.score > 1/2]
+    results = [item for item in results if item.score > 1/3]
     
     return results
 
@@ -243,6 +243,17 @@ async def thread_exists(thread):
         ids=[point_id]
         )
     return True if points else False
+
+async def delete_thread(thread):
+    response = client.delete(
+        collection_name=collection_name,
+        points_selector=models.PointIdsList(
+
+        points=[thread.id],
+
+        ),
+    )
+    return response
    
 # Example usage functions
 
