@@ -43,7 +43,7 @@ class Commands(commands.Cog):
             results = search_papers(query, limit=5)
             
             if not results:
-                await ctx.send(f"No discussions found about '{query}'. Try a different search term!")
+                await ctx.reply(f"No discussions found about '{query}'. Try a different search term!")
                 return
             
             # Get all participants from the search results
@@ -119,8 +119,18 @@ class Commands(commands.Cog):
             return
         # Check if bot is mentioned
         if self.bot.user.mentioned_in(message) and not message.author.bot:
+
             # Extract the question (remove the @bot mention)
             content = message.content.replace(f'<@{self.bot.user.id}>', '').strip()
+                        
+            # Check if the user is replying for someone else
+            if message.reference:
+                original_message = message.reference.resolved
+                if original_message:
+                    content = original_message.content
+                    message = original_message
+                else:
+                    message.channel.send('Message could not be retrieved.')
             
             if content:
                 # Treat it as a search query
