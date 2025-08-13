@@ -54,6 +54,10 @@ class Events(commands.Cog):
             return
         
         await add_thread(self.bot, thread)
+        await thread.send(
+                f"{thread.owner.mention} Add a '📌' reaction to your summary to help make my queries more accurate!\n*(This message will delete in 10 seconds)*",
+                delete_after=10
+        )
         return
     
     @commands.Cog.listener()
@@ -78,6 +82,10 @@ class Events(commands.Cog):
 
         if (self.sum_id not in before_tags) and (self.sum_id in after_tags):
             await add_thread(self.bot, after)
+            await after.send(
+                f"{after.owner.mention} Add a '📌' reaction to your summary to help make my queries more accurate!\n*(This message will delete in 10 seconds)*",
+                delete_after=10
+            )
         return
     
     # Listen for new messages in threads
