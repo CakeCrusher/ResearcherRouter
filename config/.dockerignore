@@ -1,5 +1,19 @@
+# Git
 .git
-scratch/
-discord.log
+.gitignore
+
+# Python
+__pycache__/
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Docker
 Dockerfile
-.dockerignore 
+.dockerignore
+
+# Logs and scratch files
+*.log
+scratch/
