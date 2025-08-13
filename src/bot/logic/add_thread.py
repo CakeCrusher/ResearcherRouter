@@ -16,7 +16,9 @@ async def add_thread(bot, thread):
     participants = set()
     emoji = '📌'
     summary = None
-    async for message in thread.history(limit=None, oldest_first=True):
+    async for message in thread.history(limit=None):
+        if message.author.bot:
+            return
         link = re.findall(url_pattern, message.content)
         thread_urls.extend(link)
         participants.add(message.author.id)
@@ -53,7 +55,7 @@ async def add_thread(bot, thread):
         owner_id = thread.owner_id,
         participants = [id for id in participants],
         topic = thread.name,
-        tags = [tag.name for tag in thread.applied_tags],
+        tags = [tag.id for tag in thread.applied_tags],
         urls = thread_urls,
         summary = summary,
         comments = comment_obj,
@@ -65,6 +67,7 @@ async def add_thread(bot, thread):
     python dict format: thread_obj.model_dump()
     json format: thread_obj.model_dump_json(indent=2)
     '''
+    print(thread_obj.model_dump_json(indent=2))
 
     await process_new_thread(thread_obj)
     success = await thread_exists(thread)

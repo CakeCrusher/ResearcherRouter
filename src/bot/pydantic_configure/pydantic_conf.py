@@ -27,7 +27,7 @@ class ThreadSerialized(BaseModel):
     owner_id: int       # tracks the author of the thread
     participants: List[int]
     topic: str
-    tags: List[str]
+    tags: List[int]
     urls: List[HttpUrl] = []
     summary: Optional[str] = None
     comments: List[CommentSerialized]
