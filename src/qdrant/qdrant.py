@@ -12,7 +12,8 @@ import json
 encoder = SentenceTransformer("all-MiniLM-L6-v2")
 load_dotenv()
 client = QdrantClient(url=os.environ['QDRANT_URL'], api_key=os.environ['QDRANT_API_KEY'])  # Adjust URL and API KEY as needed
-collection_name = "cool_papers"
+# testing: collection_name = "cool_papers"
+collection_name = "IEEE SPS"
 
 def create_collection():
     """Create the Qdrant collection for research papers"""
@@ -27,6 +28,11 @@ def create_collection():
         print(f"Created collection: {collection_name}")
     else:
         print(f"Collection {collection_name} already exists")
+
+def delete_collection():
+    collection_name = 'cool-papers'
+    if client.collection_exists(collection_name):
+        client.delete_collection(collection_name="{collection_name}")
 
 def add_paper_to_collection(thread_data):
     """
@@ -244,6 +250,7 @@ async def thread_exists(thread):
         )
     return True if points else False
 
+'''Removes irrelevant points from the database using thread identifiers'''
 async def delete_thread(thread):
     response = client.delete(
         collection_name=collection_name,
@@ -252,6 +259,15 @@ async def delete_thread(thread):
         points=[thread.id],
 
         ),
+    )
+    return response
+
+def delete_thread_id(id):
+    response = client.delete(
+        collection_name=collection_name,
+        points_selector=models.PointIdsList(
+            points = [id]
+        )
     )
     return response
    

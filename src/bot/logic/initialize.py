@@ -1,7 +1,7 @@
 import os
 from .add_thread import *
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from src.qdrant.qdrant import create_collection, delete_thread_id
+from src.qdrant.qdrant import create_collection, delete_thread_id, delete_collection
 # Redirect storage from Forum to store information to the vector database
 # Logs all items in the forum at startup
 async def initialize(bot):
