@@ -8,6 +8,8 @@ True: Summary = message.content
 NOTE: ENABLE MANAGE MESSAGES FOR BOT IN FORUM
 '''
 def can_manage_thread(payload, thread):
+    if not payload.member: # The event_type isn't reaction_add
+        return True
     allowed_role_ids = [int(id) for id in os.getenv('ALLOWED_ROLE_IDS', '').split(',')]
     member_roles = [role.id for role in payload.member.roles]
     has_role = False
