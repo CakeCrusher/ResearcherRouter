@@ -38,8 +38,8 @@ async def on_message_update(message, payload=None, channel=None):
         created_at = message.created_at
     )
 
-    '''testing statement'''
-    print(message_obj.model_dump_json(indent=2))
+    '''testing statement: Prints object in console'''
+    # print(message_obj.model_dump_json(indent=2))
 
     # Update the paper in Qdrant collection
     await process_thread_update(message.channel.id, message_obj, summary)

@@ -73,6 +73,5 @@ async def add_thread(bot, thread):
     success = await thread_exists(thread)
 
     # need to verify whether the database insertion was successful, then add_log_tag
-    ''' NOTE: Remove comment when testing is complete '''
-    # if success:
-    #     await add_log_tag(bot, thread)
+    if success:
+        await add_log_tag(bot, thread)

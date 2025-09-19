@@ -1,6 +1,5 @@
 import os
 
-# NOTE: No need to check if tag is already applied - checks have been performed prior to calling add_log_tag
 async def add_log_tag(bot, thread):
     logID = int(os.getenv('LOGGED_TAG'))
     channel_id = int(os.getenv('PAPER_CHANNEL_ID'))

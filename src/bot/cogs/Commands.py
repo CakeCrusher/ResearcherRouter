@@ -95,14 +95,12 @@ class Commands(commands.Cog):
                     response += "User with ID {id} not found or deleted"
             
             response += f"\n**Found {5 if len(results) > 5 else len(results)} related discussions:**\n"
-            
-            ''' NOTE: users=True once testing is finished '''
             await ctx.reply(
                 response,
                 embeds=paper_info,
                 allowed_mentions=discord.AllowedMentions(
-                    users=False,
-                    replied_user=True
+                    users=True,         # Allow pinging users
+                    replied_user=True   # Allow reply ping
                 )
             )
             
@@ -113,12 +111,12 @@ class Commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        # Test mode: validate channel
-        channel = self.bot.get_channel(int(os.getenv('ALLOWED_CHANNELS')))
-        if not message.channel == channel:
-            return
+        ## Test mode: validate channel
+        # channel = self.bot.get_channel(int(os.getenv('ALLOWED_CHANNELS')))
+        # if not message.channel == channel:
+        #     return
         # Check if bot is mentioned
-        if self.bot.user.mentioned_in(message) and not message.author.bot:
+        if self.bot.user in message.mentions and not message.mention_everyone and len(message.mentions) == 1: ## Maybe leave the old ver?
 
             # Extract the question (remove the @bot mention)
             content = message.content.replace(f'<@{self.bot.user.id}>', '').strip()
