@@ -39,6 +39,8 @@ class Commands(commands.Cog):
         Usage: !search <your question/topic>
         Example: !search machine learning
         """
+        if ctx.author.bot:
+            return
         try:
             # Search Qdrant for relevant papers
             results = search_papers(query, limit=5)
