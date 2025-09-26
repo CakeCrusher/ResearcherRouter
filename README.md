@@ -76,7 +76,6 @@ SUMMARIZED_TAG=your_summarized_tag_id_here
 LOGGED_TAG=your_logged_tag_id_here
 QDRANT_URL=your_qdrant_url_here
 QDRANT_API_KEY=your_qdrant_api_key_here
-ALLOWED_ROLE_IDS=your_role_ids_here     # set to id of @everyone role if everyone can label the summary
 ```
 
 ## 🤖 Bot Commands
