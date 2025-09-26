@@ -30,7 +30,7 @@ class Commands(commands.Cog):
 
     @commands.command()
     async def instructions(self, ctx):
-        await ctx.send(f"Try mentioning me with a question like: '{self.bot.user.mention} machine learning' or use `!search <topic>`")
+        await ctx.send(f"Try mentioning me with a question like: '{self.bot.user.mention} machine learning' or use `!search <topic>`. Using these functions will ping members involved in relevant discussions!")
         
     @commands.command()
     async def search(self, ctx, *, query):
@@ -112,7 +112,7 @@ class Commands(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        ## Test mode: validate channel
+        # Test mode: validate channel ###################################
         # channel = self.bot.get_channel(int(os.getenv('ALLOWED_CHANNELS')))
         # if not message.channel == channel:
         #     return
@@ -135,7 +135,7 @@ class Commands(commands.Cog):
                 # Treat it as a search query
                 await self.search(message, query=content)
             else:
-                await message.channel.send(f"👋 Hi! I can help you find people who discussed specific topics. Try mentioning me with a question like: '{self.bot.user.mention} machine learning' or use `!search <topic>`")
+                await message.channel.send(f"👋 Hi! I can help you find people who discussed specific topics. Try mentioning me with a question like: '{self.bot.user.mention} machine learning' or use `!search <topic>`. Using these functions will ping members involved in relevant discussions!")
 
     @commands.command()
     async def listtags(self, ctx):
