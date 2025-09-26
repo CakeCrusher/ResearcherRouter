@@ -67,7 +67,8 @@ async def add_thread(bot, thread):
     python dict format: thread_obj.model_dump()
     json format: thread_obj.model_dump_json(indent=2)
     '''
-    print(thread_obj.model_dump_json(indent=2))
+    # TESTING: Printing statement ##########################
+    # print(thread_obj.model_dump_json(indent=2))
 
     await process_new_thread(thread_obj)
     success = await thread_exists(thread)
