@@ -12,8 +12,9 @@ import json
 encoder = SentenceTransformer("all-MiniLM-L6-v2")
 load_dotenv()
 client = QdrantClient(url=os.environ['QDRANT_URL'], api_key=os.environ['QDRANT_API_KEY'])  # Adjust URL and API KEY as needed
-# testing: collection_name = "cool_papers"
-collection_name = "IEEE SPS"
+
+# testing: collection_name = "test"
+collection_name = os.environ['COLLECTION_NAME']
 
 def create_collection():
     """Create the Qdrant collection for research papers"""
