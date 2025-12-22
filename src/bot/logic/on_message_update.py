@@ -4,15 +4,15 @@ import os
 import discord
 from bot.pydantic_configure import *
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from src.qdrant.qdrant import process_thread_update
+from src.qdrant.qdrant import process_thread_update, thread_exists
 from .thread_summary import thread_summary
+from .add_log_tag import add_log_tag
 
 '''
 Called whenever a thread is updated 
 Thread in cool-papers receives a new message
 '''
-async def on_message_update(message, payload=None, channel=None):
-
+async def on_message_update(bot, message, payload=None, channel=None):
     url_pattern = r'https?:\/\/[^\s]+'
     summary = None
     if payload:
@@ -43,3 +43,6 @@ async def on_message_update(message, payload=None, channel=None):
 
     # Update the paper in Qdrant collection
     await process_thread_update(message.channel.id, message_obj, summary)
+    success = await thread_exists(message.channel)
+    if success:
+        await add_log_tag(bot, message.channel)

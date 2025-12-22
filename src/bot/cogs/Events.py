@@ -25,7 +25,7 @@ async def update_message_data(bot, message):
             return
         
         # Add the information from the message to the thread's data
-        await on_message_update(message)
+        await on_message_update(bot, message)
         return
 
 
@@ -119,7 +119,7 @@ class Events(commands.Cog):
         if self.sum_id not in tags:
             return
 
-        await on_message_update(message, payload, channel)
+        await on_message_update(self.bot, message, payload, channel)
         return
     
     # Update metadata: remove reactions to messages
@@ -138,7 +138,7 @@ class Events(commands.Cog):
         if self.sum_id not in tags:
             return
 
-        await on_message_update(message, payload, channel)
+        await on_message_update(self.bot, message, payload, channel)
         return
 
 
