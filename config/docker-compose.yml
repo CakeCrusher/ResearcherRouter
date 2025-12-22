@@ -1,6 +1,6 @@
-version: '3.7'
 services:
     web:
+      container_name: researcher-router-bot
       build:
         context: ..
         dockerfile: config/Dockerfile
