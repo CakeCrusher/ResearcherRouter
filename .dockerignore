@@ -1,6 +1,7 @@
 # Git
 .git
 .gitignore
+*.md
 
 # Python
 __pycache__/
@@ -11,9 +12,13 @@ venv/
 .env
 
 # Docker
+config/
 Dockerfile
 .dockerignore
 
 # Logs and scratch files
 *.log
 scratch/
+
+# Qdrant
+qdrant_storage
