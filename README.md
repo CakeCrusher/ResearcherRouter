@@ -70,12 +70,16 @@ poetry run python main.py
 
 Create a `.env` file with:
 ```bash
+# Discord
 DISCORD_TOKEN=your_discord_bot_token_here
 PAPER_CHANNEL_ID=your_paper_channel_id_here
 SUMMARIZED_TAG=your_summarized_tag_id_here
 LOGGED_TAG=your_logged_tag_id_here
+
+# Discord
 QDRANT_URL=your_qdrant_url_here
 QDRANT_API_KEY=your_qdrant_api_key_here
+COLLECTION_NAME=test
 ```
 
 ## 🤖 Bot Commands
