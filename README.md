@@ -99,9 +99,30 @@ COLLECTION_NAME=test
 ## 🐳 Docker Deployment
 
 ```bash
-# Build image
-sudo docker build -f config/Dockerfile -t researcher-router .
+# Clone repository and configure your .env file
+git clone https://github.com/CakeCrusher/ResearcherRouter
+cd ResearcherRouter
+nano .env
 
-# Run with environment
-sudo docker run -d --name researcher-router-bot --env-file .env researcher-router
+# Start Docker
+cd config
+docker compose up -d
 ```
+Other commands (execute in `config/`):
+```bash
+# To check that it's running
+docker compose ps
+
+# To view logs
+docker compose logs -f
+
+# To stop the container
+docker compose down
+```
+To update the existing container, rebuild the image and recreate the container automatically:
+```bash
+docker compose down
+docker compose build
+docker compose up -d
+```
+
